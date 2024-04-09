@@ -105,7 +105,7 @@ CREATE TABLE RiskIndicatorCategory (
   id INT PRIMARY KEY AUTO_INCREMENT,
   nombre VARCHAR(100) NOT NULL
 );
-CREATE TABLE RisksIndicator (
+CREATE TABLE RiskIndicator (
   id INT PRIMARY KEY AUTO_INCREMENT,
   riskind_cat_id INT NOT NULL,
   codigo VARCHAR(8) UNIQUE NOT NULL,
