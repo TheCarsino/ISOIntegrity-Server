@@ -1,6 +1,6 @@
 ### CREACION DE INDICADORES DE RIESGO
 
-USE `iso-test2`;
+-- USE `iso-test2`;
 
 INSERT INTO RiskIndicatorCategory (nombre) VALUES ('La debida diligencia relacionado con los casos de soborno en empleados');
 INSERT INTO RiskIndicatorCategory (nombre) VALUES ('La debida diligencia relacionado con los casos de soborno con los socios del negocio');

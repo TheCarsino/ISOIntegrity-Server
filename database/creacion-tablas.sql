@@ -1,6 +1,6 @@
 ### CREACION DE ROLES Y USUARIOS
 
-USE `iso-test2`;
+-- USE `iso-test2`;
 
 CREATE TABLE User (
   id INT PRIMARY KEY AUTO_INCREMENT,

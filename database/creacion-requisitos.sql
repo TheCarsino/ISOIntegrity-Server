@@ -1,6 +1,6 @@
 ### CREACION DE REQUISITOS DE LA ISO 37001
 
-USE `iso-test2`;
+-- USE `iso-test2`;
 
 # 4. CONTEXTO DE LA ORGANIZACION
 INSERT INTO StandardRequirement (nombre) VALUES ('4.1 Comprensión de la Organización y de su Contexto');

@@ -1,6 +1,6 @@
 ### CREACION DE ESCALAS DE MEDICION DE LA ISO 37001
 
-USE `iso-test2`;
+-- USE `iso-test2`;
 
 INSERT INTO SurveyScale (risks_indicator_id, descripcion_e1, descripcion_e2, descripcion_e3, descripcion_e4, descripcion_e5, descripcion_e6)
 VALUES (1, 
