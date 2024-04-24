@@ -35,7 +35,7 @@ import unitAreaRoutes from "./routes/unitarea.routes.js";
 
 const app = express();
 
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 //Ping test
 app.get("/ping", async (req, res) => {
