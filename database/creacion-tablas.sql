@@ -1,19 +1,21 @@
 ### CREACION DE ROLES Y USUARIOS
 
+USE `iso-test2`;
+
 CREATE TABLE User (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  usuario VARCHAR(50) UNIQUE NOT NULL,
-  contrasena VARCHAR(50) NOT NULL,
+  usuario VARCHAR(50) NOT NULL,
+  contrasena BINARY(64) NOT NULL,
   nombres VARCHAR(100) NOT NULL,
   apellidos VARCHAR(100) NOT NULL,
-  correo VARCHAR(100) NOT NULL UNIQUE,
+  correo VARCHAR(100) NOT NULL,
   fecha_creacion DATE NOT NULL,
   ultima_modificacion DATE NOT NULL,
   activo BOOLEAN NOT NULL
 );
 CREATE TABLE Role (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(50) UNIQUE NOT NULL,
+  nombre VARCHAR(50) NOT NULL,
   descripcion VARCHAR(150) NOT NULL,
   fecha_creacion DATE NOT NULL,
   ultima_modificacion DATE NOT NULL,
@@ -24,7 +26,7 @@ CREATE TABLE Role (
 
 CREATE TABLE Organization (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(100) UNIQUE NOT NULL,
+  nombre VARCHAR(100) NOT NULL,
   rubro VARCHAR(150),
   tipo VARCHAR(50),
   categoria VARCHAR(50),
@@ -38,7 +40,7 @@ CREATE TABLE Organization (
 );
 CREATE TABLE GroupedArea (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  codigo VARCHAR(8) UNIQUE NOT NULL,
+  codigo VARCHAR(8) NOT NULL,
   nombre VARCHAR(100) NOT NULL,
   fecha_creacion DATE NOT NULL,
   ultima_modificacion DATE NOT NULL,
@@ -47,7 +49,7 @@ CREATE TABLE GroupedArea (
 CREATE TABLE Area (
   id INT PRIMARY KEY AUTO_INCREMENT,
   grouped_area_id INT NOT NULL,
-  codigo VARCHAR(8) UNIQUE NOT NULL,
+  codigo VARCHAR(8) NOT NULL,
   nombre VARCHAR(100) NOT NULL,
   descripcion VARCHAR(300),
   responsable VARCHAR(150),
@@ -60,7 +62,7 @@ CREATE TABLE Area (
 CREATE TABLE UnitArea (
   id INT PRIMARY KEY AUTO_INCREMENT,
   area_id INT NOT NULL,
-  codigo VARCHAR(8) UNIQUE NOT NULL,
+  codigo VARCHAR(8) NOT NULL,
   nombre VARCHAR(100) NOT NULL,
   descripcion VARCHAR(300),
   responsable VARCHAR(150),
@@ -74,7 +76,7 @@ CREATE TABLE UnitArea (
 CREATE TABLE Process (
   id INT PRIMARY KEY AUTO_INCREMENT,
   unit_area_id INT NOT NULL,
-  codigo VARCHAR(8) UNIQUE NOT NULL,
+  codigo VARCHAR(8) NOT NULL,
   nombre VARCHAR(100) NOT NULL,
   descripcion VARCHAR(300),
   tiene_controles BOOLEAN NOT NULL,
@@ -108,21 +110,21 @@ CREATE TABLE RiskIndicatorCategory (
 CREATE TABLE RiskIndicator (
   id INT PRIMARY KEY AUTO_INCREMENT,
   riskind_cat_id INT NOT NULL,
-  codigo VARCHAR(8) UNIQUE NOT NULL,
+  codigo VARCHAR(8) NOT NULL,
   nombre VARCHAR(200) NOT NULL,
-  escala INT,  -- Enforces range for escala
+  escala INT,
   impacto FLOAT NOT NULL,
   
   FOREIGN KEY (riskind_cat_id) REFERENCES RiskIndicatorCategory(id)
 );
 CREATE TABLE StandardRequirement (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(60) NOT NULL
+  nombre VARCHAR(110) NOT NULL
 );
 CREATE TABLE StandardSubrequirement (
   id INT PRIMARY KEY AUTO_INCREMENT,
   std_req_id INT NOT NULL,
-  nombre VARCHAR(150) NOT NULL,
+  nombre VARCHAR(200) NOT NULL,
   
   FOREIGN KEY (std_req_id) REFERENCES StandardRequirement(id)
 );
@@ -149,7 +151,7 @@ CREATE TABLE SurveyScale (
   FOREIGN KEY (risks_indicator_id) REFERENCES RiskIndicator(id)
 );
 # TABLA HERENCIA DE LA ANTERIOR -- PARA ESTABLECER RESULTADOS HISTORICOS
-CREATE TABLE SurveyResults (
+CREATE TABLE SurveyResult (
   id INT PRIMARY KEY AUTO_INCREMENT,
   survey_scale_id INT NOT NULL,
   escala_seleccion INT NOT NULL,
@@ -163,7 +165,7 @@ CREATE TABLE SurveyResults (
 CREATE TABLE Report_WhistleAlert (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_role_unit_id INT NOT NULL,
-  codigo VARCHAR(8) UNIQUE NOT NULL,
+  codigo VARCHAR(8) NOT NULL,
   nombre_contacto VARCHAR(100),
   numero_contacto VARCHAR(20),
   correo_contacto VARCHAR(100),
@@ -179,7 +181,7 @@ CREATE TABLE Report_WhistleAlert (
 CREATE TABLE Report_RiskFactor (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_role_unit_id INT NOT NULL,
-  codigo VARCHAR(8) UNIQUE NOT NULL,
+  codigo VARCHAR(8) NOT NULL,
   descripcion_corta VARCHAR(150),
   detalle TEXT,
   informacion_adicional TEXT,
@@ -223,7 +225,7 @@ CREATE TABLE Risk (
   FOREIGN KEY (risk_treatment_id) REFERENCES RiskTreatment(id)
 );
 # TABLA DE RELACION ENTRE CASOS REPORTADOS Y RISK
-CREATE TABLE Risk_X_Reports (
+CREATE TABLE Risk_X_Report (
   id INT PRIMARY KEY AUTO_INCREMENT,
   risk_id INT NOT NULL,
   report_whistlealert_id INT NULL,
@@ -236,7 +238,7 @@ CREATE TABLE Risk_X_Reports (
   FOREIGN KEY (report_riskfactor_id) REFERENCES Report_RiskFactor(id)
 );
 # TABLA DE RELACION ENTRE REQUISITOS ISO Y RISK
-CREATE TABLE Riskr_X_StandardRequirement (
+CREATE TABLE Risk_X_StandardRequirement (
   id INT PRIMARY KEY AUTO_INCREMENT,
   risk_id INT NOT NULL,
   std_req_id INT NOT NULL,
