@@ -14,7 +14,8 @@ const User = sequelize.define(
       allowNull: false,
     },
     contrasena: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(64),
+      len: [2, 10],
       allowNull: false,
     },
     nombres: {
