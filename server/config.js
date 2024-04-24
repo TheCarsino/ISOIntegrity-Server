@@ -8,7 +8,8 @@ export const DB_NAME = "iso-test2";
 */
 /*  DEV CONSTANTS
  */
-export const DB_HOST = "isointegrity.cba6ykgaenbp.us-east-1.rds.amazonaws.com";
+export const DB_HOST =
+  "db-isointegrity.cba6ykgaenbp.us-east-1.rds.amazonaws.com";
 export const DB_PORT = 3306;
 export const DB_USER = "isoadmin";
 export const DB_CREDENTIALS = "ISOIntegrity37001";
