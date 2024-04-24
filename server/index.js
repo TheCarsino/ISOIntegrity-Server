@@ -26,8 +26,8 @@ import "./models/UnitArea.js";
 import "./models/User.js";
 import "./models/UserRoleUnit.js";
 
-import authRoutes from "./routes/auth.routes.js";
 import areaRoutes from "./routes/area.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import groupedAreaRoutes from "./routes/groupedarea.routes.js";
 import organizacionRoutes from "./routes/organization.routes.js";
 import processRoutes from "./routes/process.routes.js";
@@ -37,7 +37,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+app.use(cors({ origin: "*" }));
 //Ping test
 app.get("/ping", async (req, res) => {
   const [result] = await pool.query('SELECT "Pong" AS Result');
