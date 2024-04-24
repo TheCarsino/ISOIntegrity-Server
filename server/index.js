@@ -35,9 +35,8 @@ import unitAreaRoutes from "./routes/unitarea.routes.js";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
 app.use(cors({ origin: "*" }));
+app.use(express.json());
 //Ping test
 app.get("/ping", async (req, res) => {
   const [result] = await pool.query('SELECT "Pong" AS Result');
