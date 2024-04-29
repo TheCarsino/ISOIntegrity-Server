@@ -31,6 +31,10 @@ import authRoutes from "./routes/auth.routes.js";
 import groupedAreaRoutes from "./routes/groupedarea.routes.js";
 import organizacionRoutes from "./routes/organization.routes.js";
 import processRoutes from "./routes/process.routes.js";
+import riskRoutes from "./routes/risk.routes.js";
+import riskIndicatorRoutes from "./routes/riskindicator.routes.js";
+import standardRequirementRoutes from "./routes/standardrequirement.routes.js";
+import surveyScaleRoutes from "./routes/surveyscale.routes.js";
 import unitAreaRoutes from "./routes/unitarea.routes.js";
 
 const app = express();
@@ -61,6 +65,10 @@ app.use(areaRoutes);
 app.use(groupedAreaRoutes);
 app.use(organizacionRoutes);
 app.use(processRoutes);
+app.use(riskRoutes);
+app.use(riskIndicatorRoutes);
+app.use(standardRequirementRoutes);
+app.use(surveyScaleRoutes);
 app.use(unitAreaRoutes);
 
 app.listen(SV_PORT);

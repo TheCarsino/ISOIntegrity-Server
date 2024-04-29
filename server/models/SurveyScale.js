@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database.js";
+import SurveyResult from "./SurveyResult.js";
 import RiskIndicator from "./RiskIndicator.js";
 
 const SurveyScale = sequelize.define(

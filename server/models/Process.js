@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database.js";
-import UnitArea from "./Area.js";
+import UnitArea from "./UnitArea.js";
 
 const Process = sequelize.define(
   "Process",
