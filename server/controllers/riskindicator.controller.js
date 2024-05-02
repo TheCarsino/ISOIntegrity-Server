@@ -33,35 +33,43 @@ async function retrieveRequirements(indId) {
       riskind_id: indId,
     },
   });
-  let stdxriskPrev = null,
-    standardsub = [];
+
+  let stdxriskPrev = null;
+  let standardsub = [];
+
   for (let stdxrisk of stdXRisks) {
-    if (
-      stdxriskPrev != null &&
-      stdxriskPrev.StandardRequirement.id !== stdxrisk.StandardRequirement.id
-    ) {
-      requisitos.push({
-        id: stdxriskPrev.StandardRequirement.id,
-        nombre: stdxriskPrev.StandardRequirement.nombre,
-        subrequisitos: standardsub,
-      });
-      standardsub = [];
-    }
-    if (stdxrisk.StandardSubrequirement != null)
+    if (stdxriskPrev)
+      if (
+        stdxriskPrev != null &&
+        stdxriskPrev.StandardRequirement.id !== stdxrisk.StandardRequirement.id
+      ) {
+        requisitos.push({
+          id: stdxriskPrev.StandardRequirement.id,
+          nombre: stdxriskPrev.StandardRequirement.nombre,
+          subrequisitos: standardsub,
+        });
+        standardsub = [];
+      }
+    if (stdxrisk.StandardSubrequirement != null) {
       standardsub.push({
         id: stdxrisk.StandardSubrequirement.id,
         nombre: stdxrisk.StandardSubrequirement.nombre,
       });
-    else standardsub.push(null);
+    } else standardsub = null;
     stdxriskPrev = stdxrisk;
   }
+  requisitos.push({
+    id: stdxriskPrev.StandardRequirement.id,
+    nombre: stdxriskPrev.StandardRequirement.nombre,
+    subrequisitos: standardsub,
+  });
 
   return requisitos;
 }
 
 async function retrieveScales(indId) {
   let surveyResult = [];
-  let scales = await SurveyScale.findOne({
+  let scale = await SurveyScale.findOne({
     where: { risks_indicator_id: indId },
     attributes: [
       "id",
@@ -75,22 +83,21 @@ async function retrieveScales(indId) {
   });
 
   //Retrieve current results
-  for (const scale of scales) {
-    const result = await SurveyResult.findOne({
-      required: false,
-      where: {
-        survey_scale_id: scale.id,
-      },
-      attributes: ["escala_seleccion", "fecha_creacion"],
-      order: [["fecha_creacion", "DESC"]],
-    });
-    surveyResult.push({
-      SurveyScale: scale,
-      SurveyResult: result,
-    });
-  }
+  const result = await SurveyResult.findOne({
+    required: false,
+    where: {
+      survey_scale_id: scale.id,
+    },
+    attributes: ["escala_seleccion", "fecha_creacion"],
+    order: [["fecha_creacion", "DESC"]],
+  });
 
-  return scales.dataValues;
+  surveyResult = {
+    SurveyScale: scale,
+    SurveyResult: result,
+  };
+
+  return surveyResult;
 }
 
 async function retrieveRisks(indId) {
@@ -123,13 +130,76 @@ async function retrieveRisks(indId) {
   return listRisk;
 }
 
+function fillMetrics(indicatorDetail) {
+  let currentScaleResult =
+    indicatorDetail.Escalas?.SurveyResult?.escala_seleccion ?? 0;
+
+  currentScaleResult = (currentScaleResult / indicatorDetail.escala) * 100;
+  indicatorDetail.resultado_cuestionario = currentScaleResult;
+
+  indicatorDetail.nivel_riesgo = indicatorDetail.resultado_cuestionario * 0.85;
+  //Add Detail depending on risk
+}
+
+function fillMetricsOrganization(finalMetrics, indicatorDetail) {
+  //Now let's fill the OrganizationRisk, Total Inventory, Risk Tolerance and Cuestionary Results
+  finalMetrics.inventario_riesgo += indicatorDetail.total_riesgos;
+  finalMetrics.inventario_excedido +=
+    indicatorDetail.casos_reportados_irreg +
+    indicatorDetail.casos_reportados_riesgo;
+  finalMetrics.evaluacion_org +=
+    (indicatorDetail.resultado_cuestionario / 100) * indicatorDetail.impacto;
+  finalMetrics.nivel_riesgo_org +=
+    (indicatorDetail.nivel_riesgo / 100) * indicatorDetail.impacto;
+}
+
 async function fillIndicatorDetail(indicatorDetail) {
   indicatorDetail.Requisitos = await retrieveRequirements(indicatorDetail.id);
   indicatorDetail.Riesgos = await retrieveRisks(indicatorDetail.id);
   indicatorDetail.Escalas = await retrieveScales(indicatorDetail.id);
-
-  //Fill Metrics
+  await fillMetrics(indicatorDetail);
 }
+async function fillOrganization(finalMetrics, indicatorDetail) {
+  indicatorDetail.Riesgos = await retrieveRisks(indicatorDetail.id);
+  indicatorDetail.Escalas = await retrieveScales(indicatorDetail.id);
+  await fillMetrics(indicatorDetail);
+  await fillMetricsOrganization(finalMetrics, indicatorDetail);
+}
+
+export const getGeneralRiskbyOrganizationId = async (req, res) => {
+  let finalMetrics = {
+    inventario_riesgo: 0,
+    inventario_excedido: 0,
+    evaluacion_org: 0.0,
+    nivel_riesgo_org: 0.0,
+  };
+  try {
+    const riskindicators = await RiskIndicator.findAll({
+      attributes: ["id", "escala", "impacto"],
+    });
+    for (let ri of riskindicators) {
+      let indicatorDetail = {
+        id: ri.id,
+        Riesgos: {},
+        Escalas: {},
+        escala: ri.escala,
+        impacto: ri.impacto,
+        total_riesgos: 0,
+        casos_reportados_irreg: 0,
+        casos_reportados_riesgo: 0,
+        resultado_cuestionario: 0,
+        nivel_riesgo: 0,
+      };
+
+      await fillOrganization(finalMetrics, indicatorDetail);
+    }
+    res.json(finalMetrics);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 export const getRiskIndicator = async (req, res) => {
   try {
@@ -155,7 +225,7 @@ export const getRiskIndicatorDetail = async (req, res) => {
         id: ri.id,
         categoria: indicatorCategory.nombre,
         codigo: ri.codigo,
-        nommbre: ri.nombre,
+        nombre: ri.nombre,
         escala: ri.escala,
         impacto: ri.impacto,
         Requisitos: [],
@@ -167,7 +237,7 @@ export const getRiskIndicatorDetail = async (req, res) => {
         resultado_cuestionario: 0,
         nivel_riesgo: 0,
       };
-      fillIndicatorDetail(indicatorDetail);
+      await fillIndicatorDetail(indicatorDetail);
       riskindicatorsDetail.push(indicatorDetail);
     }
     res.json(riskindicatorsDetail);
@@ -206,7 +276,7 @@ export const getRiskIndicatorDetailbyId = async (req, res) => {
         },
       }).nombre,
       codigo: riskindicator.codigo,
-      nommbre: riskindicator.nombre,
+      nombre: riskindicator.nombre,
       escala: riskindicator.escala,
       impacto: riskindicator.impacto,
       Requisitos: [],
@@ -218,7 +288,7 @@ export const getRiskIndicatorDetailbyId = async (req, res) => {
       resultado_cuestionario: 0,
       nivel_riesgo: 0,
     };
-    fillIndicatorDetail(indicatorDetail);
+    await fillIndicatorDetail(indicatorDetail);
     res.json(indicatorDetail);
   } catch (error) {
     res.status(500).json({

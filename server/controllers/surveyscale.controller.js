@@ -2,6 +2,8 @@ import SurveyScale from "../models/SurveyScale.js";
 import SurveyResult from "../models/SurveyResult.js";
 import RiskIndicator from "../models/RiskIndicator.js";
 import RiskIndicatorCategory from "../models/RiskIndicatorCategory.js";
+import { Op } from "@sequelize/core";
+import moment from "moment";
 
 export const getLatestSurveyResults = async (req, res) => {
   try {
@@ -12,7 +14,7 @@ export const getLatestSurveyResults = async (req, res) => {
       include: [
         {
           model: RiskIndicator,
-          attributes: ["id", "nombre"],
+          attributes: ["id", "codigo", "nombre"],
           include: {
             model: RiskIndicatorCategory,
             attributes: ["nombre"],
@@ -52,6 +54,31 @@ export const getLatestSurveyResults = async (req, res) => {
     });
   }
 };
+
+export const hasCurrentResults = async (req, res) => {
+  try {
+    const today = moment();
+    const oneMonthAgo = moment().subtract(1, "months");
+
+    const scales = await SurveyResult.findAll({
+      model: SurveyResult,
+
+      where: {
+        fecha_creacion: {
+          [Op.gte]: oneMonthAgo.toDate(),
+          [Op.lt]: today.toDate(),
+        },
+      },
+    });
+    if (scales.length > 0) return res.json(true);
+    return res.json(false);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 export const getLatestSurveyResultsbyCategory = async (req, res) => {
   const { category } = req.params;
   try {
@@ -62,7 +89,7 @@ export const getLatestSurveyResultsbyCategory = async (req, res) => {
       include: [
         {
           model: RiskIndicator,
-          attributes: ["id", "nombre"],
+          attributes: ["id", "codigo", "nombre"],
           include: {
             model: RiskIndicatorCategory,
             attributes: ["nombre"],
@@ -136,9 +163,11 @@ export const createNewSurveyResultHistory = async (req, res) => {
         break;
     }
     if (!associatedString.length)
-      return res.json(
-        "Can't create a new scale that doesn't exist in the current riskindicator  options"
-      );
+      return res
+        .status(204)
+        .json(
+          "Can't create a new scale that doesn't exist in the current riskindicator  options"
+        );
     let newResult = await SurveyResult.create(
       {
         survey_scale_id: id,
@@ -167,7 +196,7 @@ export const getLatestSurveyResultsbyId = async (req, res) => {
       include: [
         {
           model: RiskIndicator,
-          attributes: ["id", "nombre"],
+          attributes: ["id", "codigo", "nombre"],
           include: {
             model: RiskIndicatorCategory,
             attributes: ["nombre"],
@@ -216,7 +245,7 @@ export const getLatestSurveyResultsbyIndicatorId = async (req, res) => {
       include: [
         {
           model: RiskIndicator,
-          attributes: ["id", "nombre"],
+          attributes: ["id", "codigo", "nombre"],
           include: {
             model: RiskIndicatorCategory,
             attributes: ["nombre"],
