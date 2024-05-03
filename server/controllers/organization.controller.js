@@ -31,15 +31,61 @@ export const getOrganizationbyId = async (req, res) => {
   }
 };
 
-export const getOrganizationStructure = async (req, res) => {
-  const { id } = req.params;
+export const getOrganizationbyStructure = async (req, res) => {
   try {
-    const organization = await Organization.findOne({
+    const structure = await GroupedArea.findAll({
+      include: [
+        {
+          model: Area,
+          include: [
+            {
+              model: UnitArea,
+              as: "Unit_Unit",
+              include: [
+                {
+                  model: Process,
+                  where: {
+                    activo: true,
+                  },
+                  required: false,
+                },
+              ],
+              where: {
+                es_area: false,
+                activo: true,
+              },
+              required: false,
+            },
+            {
+              model: UnitArea,
+              as: "Area_Unit",
+              include: [
+                {
+                  model: Process,
+                  where: {
+                    activo: true,
+                  },
+                  required: false,
+                },
+              ],
+              where: {
+                es_area: true,
+                activo: true,
+              },
+              required: false,
+            },
+          ],
+          where: {
+            activo: true,
+          },
+          required: false,
+        },
+      ],
       where: {
-        id,
+        activo: true,
       },
     });
-    res.json(organization);
+    res.json(structure);
   } catch (error) {
     res.status(500).json({
       message: error.message,

@@ -54,5 +54,6 @@ const Process = sequelize.define(
 );
 
 Process.belongsTo(UnitArea, { foreignKey: "unit_area_id" });
+UnitArea.hasMany(Process, { foreignKey: "unit_area_id" });
 
 export default Process;

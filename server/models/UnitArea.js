@@ -58,5 +58,7 @@ const UnitArea = sequelize.define(
 );
 
 UnitArea.belongsTo(Area, { foreignKey: "area_id" });
+Area.hasMany(UnitArea, { as: "Unit_Unit", foreignKey: "area_id" });
+Area.hasMany(UnitArea, { as: "Area_Unit", foreignKey: "area_id" });
 
 export default UnitArea;

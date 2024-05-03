@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database.js";
+import Area from "./Area.js";
 
 const GroupedArea = sequelize.define(
   "GroupedArea",

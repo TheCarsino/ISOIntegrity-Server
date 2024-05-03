@@ -54,5 +54,6 @@ const Area = sequelize.define(
 );
 
 Area.belongsTo(GroupedArea, { foreignKey: "grouped_area_id" });
+GroupedArea.hasMany(Area, { foreignKey: "grouped_area_id" });
 
 export default Area;
