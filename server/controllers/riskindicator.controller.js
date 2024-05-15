@@ -7,6 +7,10 @@ import SurveyResult from "../models/SurveyResult.js";
 import RiskIndSubReq from "../models/RiskIndSubReq.js";
 import RiskIndicatorCategory from "../models/RiskIndicatorCategory.js";
 import RiskTreatment from "../models/RiskTreatment.js";
+import Area from "../models/Area.js";
+import UnitArea from "../models/UnitArea.js";
+import Process from "../models/Process.js";
+import { NIVEL_RIESGO_BAJO } from "../config.js";
 
 async function retrieveRequirements(indId) {
   let requisitos = [];
@@ -106,22 +110,23 @@ async function retrieveRisks(indId) {
   });
   let listRisk = [];
 
-  for (let risk of listRisk) {
+  for (let risk of riesgos) {
     listRisk.push({
       id: risk.id,
       codigo: risk.codigo,
       tratamiento: await RiskTreatment.findOne({
         where: {
-          id: ri.risk_treatment_id,
+          id: risk.risk_treatment_id,
         },
       }).nombre,
       probabilidad: risk.probabilidad,
-      impacto: riesgos.impacto,
-      severidad: riesgos.severidad_riesgo,
+      impacto: risk.impacto,
+      severidad: risk.severidad_riesgo,
       escala: risk.escala,
       total_casos_irr: 0,
       total_casos_risk: 0,
       nivel_riesgo: risk.nivel_riesgo,
+      es_excedido: risk.nivel_riesgo > NIVEL_RIESGO_BAJO ? 1 : 0,
     });
   }
 
@@ -130,23 +135,74 @@ async function retrieveRisks(indId) {
   return listRisk;
 }
 
+async function retrieveRisksDetail(indId) {
+  let listRisk = [];
+
+  const riesgos = await Risk.findAll({
+    include: [
+      {
+        model: RiskTreatment,
+        attributes: ["nombre"],
+        allowNull: true, //LEFT JOIN
+      },
+      {
+        model: RiskIndicator,
+        include: {
+          model: RiskIndicatorCategory,
+          attributes: ["nombre"],
+        },
+      },
+      {
+        model: Process,
+        include: {
+          model: UnitArea,
+          include: {
+            model: Area,
+            where: {
+              activo: true,
+            },
+          },
+          where: {
+            activo: true,
+          },
+        },
+        where: {
+          activo: true,
+        },
+      },
+    ],
+    where: { risk_indicator_id: indId, activo: true },
+  });
+
+  listRisk = riesgos;
+  // Total Risk Cases with Report Associations
+  return listRisk;
+}
+
 function fillMetrics(indicatorDetail) {
+  function sumExcedidos(risks) {
+    var total = 0;
+    for (const risk of risks) {
+      total += risk.es_excedido;
+    }
+    return total;
+  }
+
   let currentScaleResult =
     indicatorDetail.Escalas?.SurveyResult?.escala_seleccion ?? 0;
-
   currentScaleResult = (currentScaleResult / indicatorDetail.escala) * 100;
   indicatorDetail.resultado_cuestionario = currentScaleResult;
 
   indicatorDetail.nivel_riesgo = indicatorDetail.resultado_cuestionario * 0.85;
   //Add Detail depending on risk
+  indicatorDetail.total_riesgos = indicatorDetail.Riesgos.length;
+  indicatorDetail.total_excedidos = sumExcedidos(indicatorDetail.Riesgos);
 }
 
 function fillMetricsOrganization(finalMetrics, indicatorDetail) {
   //Now let's fill the OrganizationRisk, Total Inventory, Risk Tolerance and Cuestionary Results
   finalMetrics.inventario_riesgo += indicatorDetail.total_riesgos;
-  finalMetrics.inventario_excedido +=
-    indicatorDetail.casos_reportados_irreg +
-    indicatorDetail.casos_reportados_riesgo;
+  finalMetrics.inventario_excedido += indicatorDetail.total_excedidos;
   finalMetrics.evaluacion_org +=
     (indicatorDetail.resultado_cuestionario / 100) * indicatorDetail.impacto;
   finalMetrics.nivel_riesgo_org +=
@@ -156,6 +212,13 @@ function fillMetricsOrganization(finalMetrics, indicatorDetail) {
 async function fillIndicatorDetail(indicatorDetail) {
   indicatorDetail.Requisitos = await retrieveRequirements(indicatorDetail.id);
   indicatorDetail.Riesgos = await retrieveRisks(indicatorDetail.id);
+  indicatorDetail.Escalas = await retrieveScales(indicatorDetail.id);
+  await fillMetrics(indicatorDetail);
+}
+
+async function fillIndicatorDetailbyId(indicatorDetail) {
+  indicatorDetail.Requisitos = await retrieveRequirements(indicatorDetail.id);
+  indicatorDetail.Riesgos = await retrieveRisksDetail(indicatorDetail.id);
   indicatorDetail.Escalas = await retrieveScales(indicatorDetail.id);
   await fillMetrics(indicatorDetail);
 }
@@ -288,7 +351,7 @@ export const getRiskIndicatorDetailbyId = async (req, res) => {
       resultado_cuestionario: 0,
       nivel_riesgo: 0,
     };
-    await fillIndicatorDetail(indicatorDetail);
+    await fillIndicatorDetailbyId(indicatorDetail);
     res.json(indicatorDetail);
   } catch (error) {
     res.status(500).json({

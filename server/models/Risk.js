@@ -117,7 +117,6 @@ const Risk = sequelize.define(
 );
 
 Risk.belongsTo(RiskIndicator, { foreignKey: "risk_indicator_id" });
-Risk.belongsTo(Process, { foreignKey: "process_id" });
 Risk.belongsTo(RiskTreatment, { foreignKey: "risk_treatment_id" });
 
 export default Risk;

@@ -1,5 +1,9 @@
 import UnitArea from "../models/UnitArea.js";
 import Process from "../models/Process.js";
+import Risk from "../models/Risk.js";
+import RiskTreatment from "../models/RiskTreatment.js";
+import RiskIndicator from "../models/RiskIndicator.js";
+import RiskIndicatorCategory from "../models/RiskIndicatorCategory.js";
 
 export const getUnitArea = async (req, res) => {
   try {
@@ -116,6 +120,45 @@ export const getProcessbyUnitAreaId = async (req, res) => {
       },
     });
     res.json(unitareas);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getProcessRisksbyUnitAreaId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const processes_risk = await Process.findAll({
+      where: {
+        unit_area_id: id,
+        activo: true,
+      },
+      include: [
+        {
+          model: Risk,
+          include: [
+            {
+              model: RiskTreatment,
+              attributes: ["nombre"],
+              allowNull: true, //LEFT JOIN
+            },
+            {
+              model: RiskIndicator,
+              include: {
+                model: RiskIndicatorCategory,
+                attributes: ["nombre"],
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    //Add Risk Cases
+
+    res.json(processes_risk);
   } catch (error) {
     res.status(500).json({
       message: error.message,

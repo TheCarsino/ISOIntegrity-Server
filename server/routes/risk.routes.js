@@ -7,10 +7,12 @@ import {
   createRisk,
   updateRisk,
   deleteRisk,
+  getRiskTreatments,
 } from "../controllers/risk.controller.js";
 
 const router = Router();
 
+router.get("/risk/treatments", getRiskTreatments);
 router.get("/risk", getRisks);
 router.get("/risk/detail", getRiskDetail);
 router.get("/risk/:id", getRiskbyId);

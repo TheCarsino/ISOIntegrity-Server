@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database.js";
 import UnitArea from "./UnitArea.js";
+import Risk from "./Risk.js";
 
 const Process = sequelize.define(
   "Process",
@@ -55,5 +56,7 @@ const Process = sequelize.define(
 
 Process.belongsTo(UnitArea, { foreignKey: "unit_area_id" });
 UnitArea.hasMany(Process, { foreignKey: "unit_area_id" });
+Process.hasMany(Risk, { foreignKey: "process_id" });
+Risk.belongsTo(Process, { foreignKey: "process_id" });
 
 export default Process;

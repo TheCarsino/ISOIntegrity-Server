@@ -109,13 +109,31 @@ export const deleteProcess = async (req, res) => {
 export const getRiskbyProcessId = async (req, res) => {
   const { id } = req.params;
   try {
+    let riskDetail = [];
     const risks = await Risk.findAll({
+      include: [
+        {
+          model: RiskTreatment,
+          attributes: ["nombre"],
+          allowNull: true, //LEFT JOIN
+        },
+        {
+          model: RiskIndicator,
+          include: {
+            model: RiskIndicatorCategory,
+            attributes: ["nombre"],
+          },
+        },
+      ],
       where: {
-        process_id: id,
+        process_id: true,
         activo: true,
       },
     });
-    res.json(risks);
+
+    riskDetail = risks;
+    //Add Risk Cases
+    res.json(riskDetail);
   } catch (error) {
     res.status(500).json({
       message: error.message,

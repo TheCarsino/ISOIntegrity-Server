@@ -134,6 +134,17 @@ async function fillIndicatorDetail(indicatorDetail) {
   //Fill Metrics
 }
 
+export const getRiskTreatments = async (req, res) => {
+  try {
+    const risksTreats = await RiskTreatment.findAll();
+    res.json(risksTreats);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 export const getRisks = async (req, res) => {
   try {
     const risks = await Risk.findAll({
@@ -156,7 +167,16 @@ export const getRisks = async (req, res) => {
             model: UnitArea,
             include: {
               model: Area,
+              where: {
+                activo: true,
+              },
             },
+            where: {
+              activo: true,
+            },
+          },
+          where: {
+            activo: true,
           },
         },
       ],
@@ -168,6 +188,7 @@ export const getRisks = async (req, res) => {
     });
   }
 };
+
 export const getRiskDetail = async (req, res) => {
   try {
     let riskDetail = [];
@@ -191,7 +212,16 @@ export const getRiskDetail = async (req, res) => {
             model: UnitArea,
             include: {
               model: Area,
+              where: {
+                activo: true,
+              },
             },
+            where: {
+              activo: true,
+            },
+          },
+          where: {
+            activo: true,
           },
         },
       ],
@@ -230,7 +260,16 @@ export const getRiskbyId = async (req, res) => {
             model: UnitArea,
             include: {
               model: Area,
+              where: {
+                activo: true,
+              },
             },
+            where: {
+              activo: true,
+            },
+          },
+          where: {
+            activo: true,
           },
         },
       ],
@@ -269,7 +308,16 @@ export const getRiskDetailbyId = async (req, res) => {
             model: UnitArea,
             include: {
               model: Area,
+              where: {
+                activo: true,
+              },
             },
+            where: {
+              activo: true,
+            },
+          },
+          where: {
+            activo: true,
           },
         },
       ],
@@ -331,7 +379,27 @@ export const createRisk = async (req, res) => {
         activo: true,
       },
       {
-        fields: ["fecha_creacion", "ultima_modificacion", "activo"],
+        fields: [
+          "risk_indicator_id",
+          "process_id",
+          "risk_treatment_id",
+          "codigo",
+          "nombre",
+          "descripcion",
+          "probabilidad",
+          "impacto",
+          "severidad_riesgo",
+          "escala_indicador",
+          "sintomas",
+          "causas",
+          "plan_accion",
+          "responsables_encargados",
+          "especificacion",
+          "nivel_riesgo",
+          "fecha_creacion",
+          "ultima_modificacion",
+          "activo",
+        ],
       }
     );
     return res.json(newRisk);
@@ -376,7 +444,7 @@ export const updateRisk = async (req, res) => {
     risk.severidad_riesgo = severidad_riesgo;
     risk.escala_indicador = escala_indicador;
     risk.sintomas = sintomas;
-    risk.escala_indicador = causas;
+    risk.causas = causas;
     risk.plan_accion = plan_accion;
     risk.responsables_encargados = responsables_encargados;
     risk.especificacion = especificacion;
