@@ -354,7 +354,14 @@ VALUES (44,
         'Un millón - 9,999,999', 
         '10 millones - 999,999,999',
         'Más de 100 millones');
-
         
-SELECT ind.id, ind.codigo, sca. descripcion_e1, sca. descripcion_e2, sca. descripcion_e3, sca. descripcion_e4, sca. descripcion_e5, sca. descripcion_e6 FROM surveyscale AS sca
-INNER JOIN riskindicator AS ind ON ind.id = sca.risks_indicator_id
+SELECT ind.id, cat.nombre, ind.codigo, ind.nombre, sca. descripcion_e1, sca. descripcion_e2, sca. descripcion_e3, sca. descripcion_e4, 
+		sca. descripcion_e5, sca. descripcion_e6, sr.id, sr.escala_seleccion, sr.fecha_creacion AS latest_fecha_creacion
+FROM SurveyScale AS sca
+INNER JOIN RiskIndicator AS ind ON ind.id = sca.risks_indicator_id
+INNER JOIN RiskIndicatorCategory AS cat ON cat.id = ind.riskind_cat_id
+LEFT JOIN SurveyResult AS sr ON sr.survey_scale_id = sca.id
+	AND sr.fecha_creacion = (
+    SELECT MAX(fecha_creacion) FROM SurveyResult AS sr2 WHERE sr2.survey_scale_id = sca.id
+  )
+GROUP BY sca.id, ind.id, cat.id, sca.descripcion_e1, sca.descripcion_e2, sca.descripcion_e3, sca.descripcion_e4, sca.descripcion_e5, sca.descripcion_e6;

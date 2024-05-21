@@ -118,5 +118,5 @@ VALUES (28, '9.3.2) Revisión del órgano de gobierno');
 SELECT * FROM standardrequirement;
 
 SELECT std.nombre, sub.nombre 
-FROM standardrequirement AS std
-INNER JOIN standardsubrequirement AS sub ON sub.std_req_id = std.id;
+FROM StandardRequirement AS std
+INNER JOIN StandardSubrequirement AS sub ON sub.std_req_id = std.id;

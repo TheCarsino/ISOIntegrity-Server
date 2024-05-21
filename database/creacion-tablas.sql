@@ -9,16 +9,16 @@ CREATE TABLE User (
   nombres VARCHAR(100) NOT NULL,
   apellidos VARCHAR(100) NOT NULL,
   correo VARCHAR(100) NOT NULL,
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL
 );
 CREATE TABLE Role (
   id INT PRIMARY KEY AUTO_INCREMENT,
   nombre VARCHAR(50) NOT NULL,
   descripcion VARCHAR(150) NOT NULL,
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL
 );
 
@@ -34,16 +34,16 @@ CREATE TABLE Organization (
   ciudad VARCHAR(100),
   pais VARCHAR(60),
   logo_filename VARCHAR(255),
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL
 );
 CREATE TABLE GroupedArea (
   id INT PRIMARY KEY AUTO_INCREMENT,
   codigo VARCHAR(8) NOT NULL,
   nombre VARCHAR(100) NOT NULL,
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL
 );
 CREATE TABLE Area (
@@ -53,8 +53,8 @@ CREATE TABLE Area (
   nombre VARCHAR(100) NOT NULL,
   descripcion VARCHAR(300),
   responsable VARCHAR(150),
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
   
   FOREIGN KEY (grouped_area_id) REFERENCES GroupedArea(id)
@@ -67,8 +67,8 @@ CREATE TABLE UnitArea (
   descripcion VARCHAR(300),
   responsable VARCHAR(150),
   es_area BOOLEAN NOT NULL,
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
 
   FOREIGN KEY (area_id) REFERENCES Area(id)
@@ -80,8 +80,8 @@ CREATE TABLE Process (
   nombre VARCHAR(100) NOT NULL,
   descripcion VARCHAR(300),
   tiene_controles BOOLEAN NOT NULL,
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
 
   FOREIGN KEY (unit_area_id) REFERENCES UnitArea(id)
@@ -92,8 +92,8 @@ CREATE TABLE User_X_Role_X_Unit (
   user_id INT NOT NULL,
   role_id INT NOT NULL,
   unit_area_id INT NULL,
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
 
   FOREIGN KEY (user_id) REFERENCES User(id),
@@ -155,7 +155,7 @@ CREATE TABLE SurveyResult (
   id INT PRIMARY KEY AUTO_INCREMENT,
   survey_scale_id INT NOT NULL,
   escala_seleccion INT NOT NULL,
-  fecha_creacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
   
   FOREIGN KEY (survey_scale_id) REFERENCES SurveyScale(id)
 );
@@ -173,7 +173,7 @@ CREATE TABLE Report_WhistleAlert (
   detalles_cargo TEXT,
   divulgacion TEXT,
   informacion_adicional TEXT,
-  fecha_registro DATE NOT NULL,
+  fecha_registro DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
   
   FOREIGN KEY (user_role_unit_id) REFERENCES User_X_Role_X_Unit(id)
@@ -185,7 +185,7 @@ CREATE TABLE Report_RiskFactor (
   descripcion_corta VARCHAR(150),
   detalle TEXT,
   informacion_adicional TEXT,
-  fecha_registro DATE NOT NULL,
+  fecha_registro DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
   
   FOREIGN KEY (user_role_unit_id) REFERENCES User_X_Role_X_Unit(id)
@@ -215,9 +215,9 @@ CREATE TABLE Risk (
   responsables_encargados TEXT,
   especificacion TEXT,
   nivel_riesgo FLOAT DEFAULT 0,
-  fecha_creacion DATE NOT NULL,
-  ultima_modificacion DATE NOT NULL,
-  ultima_evaluacion_riesgo DATE,
+  fecha_creacion DATETIME NOT NULL,
+  ultima_modificacion DATETIME NOT NULL,
+  ultima_evaluacion_riesgo DATETIME,
   activo BOOLEAN NOT NULL,
   
   FOREIGN KEY (risk_indicator_id) REFERENCES RiskIndicator(id),
@@ -230,7 +230,7 @@ CREATE TABLE Risk_X_Report (
   risk_id INT NOT NULL,
   report_whistlealert_id INT NULL,
   report_riskfactor_id INT NULL,
-  fecha_creacion DATE NOT NULL,
+  fecha_creacion DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
   
   FOREIGN KEY (risk_id) REFERENCES Risk(id),

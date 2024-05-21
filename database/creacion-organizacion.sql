@@ -22,7 +22,8 @@ VALUES ('Administrador', 'Acceso total a la información del sistema.', CURDATE(
 INSERT INTO User (usuario, contrasena, nombres, apellidos, correo, fecha_creacion, ultima_modificacion, activo)
 VALUES ('adminTest', '122www', 'System', 'Administrator', 'admintest@example.com', CURDATE(), CURDATE(), TRUE);
 -- Dont forget to update the user later via API
-
+INSERT INTO User_X_Role_X_Unit (user_id, role_id, unit_area_id, fecha_creacion, ultima_modificacion, activo)
+VALUES(1,1,NULL,CURDATE(), CURDATE(), TRUE);
 /*
 SAMPLE DATA --> DON'T RUN THIS PART OF THE QUERY --> DO IT FROM THE API
 
@@ -36,6 +37,7 @@ SELECT * FROM Organization;
 SELECT * FROM RiskTreatment;
 
 -- Auth Query
+
 SELECT 	uru.id, uru.user_id, u.usuario, u.nombres, u.apellidos, u.correo, 
 		uru.role_id, r.nombre AS role_nombre, r.descripcion AS role_descripcion, 
         uru.unit_area_id, COALESCE(a.codigo, 'NULL') AS unit_area_codigo, COALESCE(a.nombre, 'NULL') AS unit_area_nombre
