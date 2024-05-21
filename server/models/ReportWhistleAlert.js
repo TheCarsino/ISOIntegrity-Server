@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database.js";
-import UserRoleUnit from "./UserRoleUnit.js";
+import User from "./User.js";
 
 const ReportWhistleAlert = sequelize.define(
   "Report_WhistleAlert",
@@ -10,11 +10,11 @@ const ReportWhistleAlert = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    user_role_unit_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "User_X_Role_X_Unit",
+        model: "User",
         key: "id",
       },
     },
@@ -65,8 +65,8 @@ const ReportWhistleAlert = sequelize.define(
   }
 );
 
-ReportWhistleAlert.belongsTo(UserRoleUnit, {
-  foreignKey: "user_role_unit_id",
+ReportWhistleAlert.belongsTo(User, {
+  foreignKey: "user_id",
 });
 
 export default ReportWhistleAlert;

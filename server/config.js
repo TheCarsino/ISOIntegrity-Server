@@ -14,8 +14,3 @@ export const DB_USER = "isoadmin";
 export const DB_CREDENTIALS = "ISOIntegrity37001";
 export const DB_NAME = "dbisointegrity";
 */
-
-//CONSTANTS
-export const NIVEL_RIESGO_BAJO = 33.33;
-export const NIVEL_RIESGO_MEDIO = 66.66;
-export const NIVEL_RIESGO_ALTO = 100.0;

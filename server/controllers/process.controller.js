@@ -1,5 +1,8 @@
 import Process from "../models/Process.js";
 import Risk from "../models/Risk.js";
+import RiskIndicator from "../models/RiskIndicator.js";
+import RiskIndicatorCategory from "../models/RiskIndicatorCategory.js";
+import RiskTreatment from "../models/RiskTreatment.js";
 
 export const getProcess = async (req, res) => {
   try {
@@ -126,7 +129,7 @@ export const getRiskbyProcessId = async (req, res) => {
         },
       ],
       where: {
-        process_id: true,
+        process_id: id,
         activo: true,
       },
     });

@@ -10,6 +10,57 @@ import RiskTreatment from "../models/RiskTreatment.js";
 import Process from "../models/Process.js";
 import UnitArea from "../models/UnitArea.js";
 import Area from "../models/Area.js";
+import { calculateRiskCases } from "../constants/metrics.js";
+import RiskReport from "../models/RiskReport.js";
+import { Op } from "sequelize";
+
+async function getRiskCases(riskId) {
+  const today = new Date();
+  const oneYearAgo = new Date(
+    today.getFullYear() - 1,
+    today.getMonth(),
+    today.getDate()
+  );
+
+  const riskReports = await RiskReport.findAll({
+    where: {
+      risk_id: riskId,
+      activo: true,
+      fecha_creacion: {
+        [Op.gte]: oneYearAgo,
+        [Op.lte]: today,
+      },
+    },
+  });
+
+  /* CURRENT METRIC FOR THE EVALUATION OF THE RISK LEVEL -- CAN BE CHANGED LATER */
+  let numCases = calculateRiskCases(riskReports);
+
+  return numCases;
+}
+
+async function calculateRiskLevel(risk) {
+  const today = new Date();
+  const oneYearAgo = new Date(
+    today.getFullYear() - 1,
+    today.getMonth(),
+    today.getDate()
+  );
+
+  const riskReports = await RiskReport.findAll({
+    where: {
+      risk_id: risk.id,
+      activo: true,
+      fecha_creacion: {
+        [Op.gte]: oneYearAgo,
+        [Op.lte]: today,
+      },
+    },
+  });
+
+  /* CURRENT METRIC FOR THE EVALUATION OF THE RISK LEVEL -- CAN BE CHANGED LATER */
+  return evaluateRiskLevelbyReports(risk, riskReports);
+}
 
 async function retrieveRequirements(indId) {
   let requisitos = [];
@@ -180,6 +231,9 @@ export const getRisks = async (req, res) => {
           },
         },
       ],
+      where: {
+        activo: true,
+      },
     });
     res.json(risks);
   } catch (error) {
@@ -225,10 +279,46 @@ export const getRiskDetail = async (req, res) => {
           },
         },
       ],
+      where: {
+        activo: true,
+      },
     });
 
-    riskDetail = risks;
     //Add Risk Cases
+    for (const risk of risks) {
+      const currentDetail = {
+        id: risk.id,
+        risk_indicator_id: risk.risk_indicator_id,
+        process_id: risk.process_id,
+        risk_treatment_id: risk.risk_treatment_id,
+        codigo: risk.codigo,
+        nombre: risk.nombre,
+        descripcion: risk.descripcion,
+        probabilidad: risk.probabilidad,
+        impacto: risk.impacto,
+        severidad_riesgo: risk.severidad_riesgo,
+        escala_indicador: risk.escala_indicador,
+        sintomas: risk.sintomas,
+        causas: risk.causas,
+        plan_accion: risk.plan_accion,
+        responsables_encargados: risk.responsables_encargados,
+        especificacion: risk.especificacion,
+        nivel_riesgo: risk.nivel_riesgo,
+        fecha_creacion: risk.fecha_creacion,
+        ultima_modificacion: risk.ultima_modificacion,
+        ultima_evaluacion_riesgo: risk.ultima_evaluacion_riesgo,
+        activo: risk.activo,
+        RiskTreatment: risk.RiskTreatment,
+        RiskIndicator: risk.RiskIndicator,
+        Process: risk.Process,
+        total_whistlecases: 0,
+        total_factorcases: 0,
+      };
+      const numCases = await getRiskCases(risk.id);
+      currentDetail.total_whistlecases = numCases[0];
+      currentDetail.total_factorcases = numCases[1];
+      riskDetail.push(currentDetail);
+    }
 
     res.json(riskDetail);
   } catch (error) {
@@ -275,6 +365,7 @@ export const getRiskbyId = async (req, res) => {
       ],
       where: {
         id,
+        activo: true,
       },
     });
     res.json(risks);
@@ -323,6 +414,7 @@ export const getRiskDetailbyId = async (req, res) => {
       ],
       where: {
         id: id,
+        activo: true,
       },
     });
 
@@ -356,6 +448,12 @@ export const createRisk = async (req, res) => {
     especificacion,
   } = req.body;
   try {
+    /* CURRENT METRIC FOR THE EVALUATION OF THE RISK LEVEL -- CAN BE CHANGED LATER */
+    const riskLevel = evaluateRiskLevelbyReports(
+      { severidad_riesgo: severidad_riesgo },
+      []
+    );
+
     let newRisk = await Risk.create(
       {
         risk_indicator_id,
@@ -373,7 +471,7 @@ export const createRisk = async (req, res) => {
         plan_accion,
         responsables_encargados,
         especificacion,
-        nivel_riesgo: 0,
+        nivel_riesgo: riskLevel,
         fecha_creacion: new Date().getTime(),
         ultima_modificacion: new Date().getTime(),
         activo: true,
@@ -402,6 +500,7 @@ export const createRisk = async (req, res) => {
         ],
       }
     );
+
     return res.json(newRisk);
   } catch (error) {
     res.status(500).json({
@@ -451,7 +550,7 @@ export const updateRisk = async (req, res) => {
     risk.ultima_modificacion = new Date().getTime();
 
     //Validation if --> severidad has been modified [change risk level -- base or with cases]
-
+    risk.nivel_riesgo = await calculateRiskLevel(risk);
     await risk.save();
 
     res.json(risk);
@@ -464,8 +563,8 @@ export const deleteRisk = async (req, res) => {
   const { id } = req.params;
   try {
     const risk = await Risk.findByPk(id);
-    process.ultima_modificacion = new Date().getTime();
-    process.activo = false;
+    risk.ultima_modificacion = new Date().getTime();
+    risk.activo = false;
     await risk.save();
 
     return res.sendStatus(204);

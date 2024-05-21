@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database.js";
-import UserRoleUnit from "./UserRoleUnit.js";
+import User from "./User.js";
 
 const ReportRiskFactor = sequelize.define(
   "ReportRiskFactor",
@@ -10,11 +10,11 @@ const ReportRiskFactor = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    user_role_unit_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "User_X_Role_X_Unit",
+        model: "User",
         key: "id",
       },
     },
@@ -49,8 +49,8 @@ const ReportRiskFactor = sequelize.define(
   }
 );
 
-ReportRiskFactor.belongsTo(UserRoleUnit, {
-  foreignKey: "user_role_unit_id",
+ReportRiskFactor.belongsTo(User, {
+  foreignKey: "user_id",
 });
 
 export default ReportRiskFactor;

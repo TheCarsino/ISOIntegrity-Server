@@ -27,6 +27,7 @@ import "./models/User.js";
 import "./models/UserRoleUnit.js";
 
 import areaRoutes from "./routes/area.routes.js";
+import alertRoutes from "./routes/alert.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import groupedAreaRoutes from "./routes/groupedarea.routes.js";
 import organizacionRoutes from "./routes/organization.routes.js";
@@ -61,6 +62,7 @@ try {
 
 /* Routes inclusion */
 app.use(authRoutes);
+app.use(alertRoutes);
 app.use(areaRoutes);
 app.use(groupedAreaRoutes);
 app.use(organizacionRoutes);

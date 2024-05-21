@@ -3,6 +3,7 @@ import Role from "../models/Role.js";
 import UnitArea from "../models/UnitArea.js";
 import UserRoleUnit from "../models/UserRoleUnit.js";
 import bcrypt from "bcrypt";
+import { COLABORADOR } from "../constants/metrics.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -276,6 +277,12 @@ export const createUserPermission = async (req, res) => {
       if (userPermission[i].unit_area_id === unit_area_id)
         return res.json("Can't insert the same permission");
     }
+
+    if (role_id == COLABORADOR && unit_area_id == null)
+      return res.json(
+        "A user with the role <Colaborator> cannot has permissions to all Units"
+      );
+
     let newUserPermission = await UserRoleUnit.create(
       {
         user_id,
@@ -344,31 +351,52 @@ export const authenticateUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    const userAuthenticated = await UserRoleUnit.findAll({
+    let userAuthenticated = [];
+
+    const permissions = await UserRoleUnit.findAll({
       attributes: ["id", "user_id", "role_id", "unit_area_id"],
       include: [
         {
           model: User,
           attributes: ["usuario", "nombres", "apellidos", "correo"],
-          where: { activo: 1 },
+          where: { activo: true },
         },
         {
           model: Role,
           attributes: ["nombre", "descripcion"],
-          where: { activo: 1 },
+          where: { activo: true },
         },
         {
           model: UnitArea,
           attributes: ["codigo", "nombre"],
-          where: { activo: 1 },
+          where: { activo: true },
           required: false, // LEFT JOIN
         },
       ],
       where: {
         user_id: user.id,
-        activo: 1,
+        activo: true,
       },
     });
+
+    let unitList = [];
+
+    for (let permission of permissions) {
+      if (permission.UnitArea != null)
+        unitList.push({
+          id: permission.unit_area_id,
+          codigo: permission.UnitArea.codigo,
+          nombre: permission.UnitArea.nombre,
+        });
+    }
+    userAuthenticated = {
+      user_id: permissions[0].user_id,
+      role_id: permissions[0].role_id,
+      User: permissions[0].User,
+      Role: permissions[0].Role,
+      UnitAreas: unitList.length == 0 ? null : unitList,
+    };
+
     return res.json(userAuthenticated);
   } catch (error) {
     console.error("Error authenticating user:", error);
