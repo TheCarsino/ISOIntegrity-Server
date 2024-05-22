@@ -116,6 +116,7 @@ const Risk = sequelize.define(
   }
 );
 
+RiskTreatment.hasMany(Risk, { foreignKey: "risk_treatment_id" });
 Risk.belongsTo(RiskIndicator, { foreignKey: "risk_indicator_id" });
 Risk.belongsTo(RiskTreatment, { foreignKey: "risk_treatment_id" });
 

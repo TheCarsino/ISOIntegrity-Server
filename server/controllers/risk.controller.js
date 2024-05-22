@@ -10,7 +10,10 @@ import RiskTreatment from "../models/RiskTreatment.js";
 import Process from "../models/Process.js";
 import UnitArea from "../models/UnitArea.js";
 import Area from "../models/Area.js";
-import { calculateRiskCases } from "../constants/metrics.js";
+import {
+  calculateRiskCases,
+  evaluateRiskLevelbyReports,
+} from "../constants/metrics.js";
 import RiskReport from "../models/RiskReport.js";
 import { Op } from "sequelize";
 

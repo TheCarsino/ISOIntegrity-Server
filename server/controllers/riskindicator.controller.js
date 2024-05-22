@@ -322,7 +322,34 @@ export const getGeneralRiskbyOrganizationId = async (req, res) => {
 
       await fillOrganization(finalMetrics, indicatorDetail);
     }
-    res.json(finalMetrics);
+
+    //Now bring the results for the risk categories
+    const riskTreatments = await RiskTreatment.findAll({
+      attributes: ["id", "nombre"],
+      include: [
+        {
+          attributes: ["id", "nivel_riesgo"],
+          model: Risk,
+          where: {
+            activo: true,
+          },
+          required: true,
+        },
+      ],
+    });
+    const riskNoTreatments = await Risk.findAll({
+      attributes: ["id", "nivel_riesgo"],
+      where: {
+        activo: true,
+        risk_treatment_id: null,
+      },
+    });
+
+    res.json({
+      metrics: finalMetrics,
+      risks_category: riskTreatments,
+      risks_no_category: riskNoTreatments,
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
