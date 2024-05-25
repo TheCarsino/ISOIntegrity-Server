@@ -135,12 +135,11 @@ async function retrieveRisks(indicatorDetail) {
   const riesgos = await Risk.findAll({
     where: { risk_indicator_id: indicatorDetail.id, activo: true },
   });
-  let listRisk = [];
+  let listRisk = [],
+    total_nivel_riesgo = 0;
 
   for (let risk of riesgos) {
     const numCases = await getRiskCases(risk.id);
-    indicatorDetail.casos_reportados_irreg += numCases[0];
-    indicatorDetail.casos_reportados_riesgo += numCases[1];
 
     listRisk.push({
       id: risk.id,
@@ -159,7 +158,16 @@ async function retrieveRisks(indicatorDetail) {
       nivel_riesgo: risk.nivel_riesgo,
       es_excedido: risk.nivel_riesgo > NIVEL_RIESGO_BAJO ? 1 : 0,
     });
+
+    indicatorDetail.casos_reportados_irreg += numCases[0];
+    indicatorDetail.casos_reportados_riesgo += numCases[1];
+    indicatorDetail.total_excedidos +=
+      risk.nivel_riesgo > NIVEL_RIESGO_BAJO ? 1 : 0;
+    total_nivel_riesgo += risk.nivel_riesgo * (risk.escala_indicador / 100);
   }
+  indicatorDetail.total_nivel_riesgo_x_risk =
+    total_nivel_riesgo > 100 ? 100 : total_nivel_riesgo;
+  indicatorDetail.total_riesgos = listRisk.length;
 
   return listRisk;
 }
@@ -203,6 +211,7 @@ async function retrieveRisksDetail(indicatorDetail) {
     where: { risk_indicator_id: indicatorDetail.id, activo: true },
   });
   //Add Risk Cases
+  let total_nivel_riesgo = 0;
   for (const risk of risks) {
     const currentDetail = {
       id: risk.id,
@@ -240,29 +249,27 @@ async function retrieveRisksDetail(indicatorDetail) {
     indicatorDetail.casos_reportados_riesgo += currentDetail.total_factorcases;
 
     listRisk.push(currentDetail);
+    indicatorDetail.total_excedidos +=
+      risk.nivel_riesgo > NIVEL_RIESGO_BAJO ? 1 : 0;
+    total_nivel_riesgo += risk.nivel_riesgo * (risk.escala_indicador / 100);
   }
+  indicatorDetail.total_nivel_riesgo_x_risk =
+    total_nivel_riesgo > 100 ? 100 : total_nivel_riesgo;
+  indicatorDetail.total_riesgos = listRisk.length;
 
   return listRisk;
 }
 
 function fillMetrics(indicatorDetail) {
-  function sumExcedidos(risks) {
-    var total = 0;
-    for (const risk of risks) {
-      total += risk.es_excedido;
-    }
-    return total;
-  }
-
   let currentScaleResult =
     indicatorDetail.Escalas?.SurveyResult?.escala_seleccion ?? 0;
   currentScaleResult = (currentScaleResult / indicatorDetail.escala) * 100;
   indicatorDetail.resultado_cuestionario = currentScaleResult;
-
-  indicatorDetail.nivel_riesgo = indicatorDetail.resultado_cuestionario * 0.85;
-  //Add Detail depending on risk
-  indicatorDetail.total_riesgos = indicatorDetail.Riesgos.length;
-  indicatorDetail.total_excedidos = sumExcedidos(indicatorDetail.Riesgos);
+  if (indicatorDetail.total_nivel_riesgo_x_risk > 0)
+    indicatorDetail.nivel_riesgo =
+      indicatorDetail.resultado_cuestionario * 0.5 +
+      indicatorDetail.total_nivel_riesgo_x_risk * 0.5;
+  else indicatorDetail.nivel_riesgo = indicatorDetail.resultado_cuestionario;
 }
 
 function fillMetricsOrganization(finalMetrics, indicatorDetail) {
@@ -314,6 +321,8 @@ export const getGeneralRiskbyOrganizationId = async (req, res) => {
         escala: ri.escala,
         impacto: ri.impacto,
         total_riesgos: 0,
+        total_excedidos: 0,
+        total_nivel_riesgo_x_risk: 0,
         casos_reportados_irreg: 0,
         casos_reportados_riesgo: 0,
         resultado_cuestionario: 0,
@@ -388,6 +397,8 @@ export const getRiskIndicatorDetail = async (req, res) => {
         Escalas: null,
         Riesgos: [],
         total_riesgos: 0,
+        total_excedidos: 0,
+        total_nivel_riesgo_x_risk: 0,
         casos_reportados_irreg: 0,
         casos_reportados_riesgo: 0,
         resultado_cuestionario: 0,
@@ -439,6 +450,8 @@ export const getRiskIndicatorDetailbyId = async (req, res) => {
       Escalas: null,
       Riesgos: [],
       total_riesgos: 0,
+      total_excedidos: 0,
+      total_nivel_riesgo_x_risk: 0,
       casos_reportados_irreg: 0,
       casos_reportados_riesgo: 0,
       resultado_cuestionario: 0,

@@ -3,8 +3,8 @@ import sequelize from "../database/database.js";
 import Risk from "./Risk.js";
 import StandardRequirement from "./StandardRequirement.js";
 
-const RiskStandard = sequelize.define(
-  "RiskStandard",
+const RiskStandardRequirement = sequelize.define(
+  "RiskStandardRequirement",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -38,7 +38,9 @@ const RiskStandard = sequelize.define(
   }
 );
 
-RiskStandard.belongsTo(Risk, { foreignKey: "risk_id" });
-RiskStandard.belongsTo(StandardRequirement, { foreignKey: "std_req_id" });
+RiskStandardRequirement.belongsTo(Risk, { foreignKey: "risk_id" });
+RiskStandardRequirement.belongsTo(StandardRequirement, {
+  foreignKey: "std_req_id",
+});
 
-export default RiskStandard;
+export default RiskStandardRequirement;

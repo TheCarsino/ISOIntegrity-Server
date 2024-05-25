@@ -8,16 +8,20 @@ export const ALTA_DIRECTIVA = 2;
 export const GESTOR_PROYECTOS = 3;
 export const COLABORADOR = 4;
 
+const SEVERITY_FACTOR_LOG = 0.125;
+const SEVERITY_FACTOR = 0.5;
+const MIN_CASES_LOG = 2;
+
 //ARITHMETIC FUNCTIONS
 
 export function logaritmicCalculation(severity, num_cases) {
   let riskLevel = 0;
 
   if (num_cases > 0) {
-    const naturalLog = Math.log((num_cases + 2) * (1 + severity));
-    riskLevel = (severity * 0.125 + (1 - 1 / naturalLog)) * 100;
+    const naturalLog = Math.log((num_cases + MIN_CASES_LOG) * (1 + severity));
+    riskLevel = (severity * SEVERITY_FACTOR_LOG + (1 - 1 / naturalLog)) * 100;
   } else {
-    riskLevel = severity * 0.25 * 100;
+    riskLevel = severity * SEVERITY_FACTOR * 100;
   }
 
   return riskLevel;
