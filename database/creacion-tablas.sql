@@ -164,7 +164,7 @@ CREATE TABLE SurveyResult (
 
 CREATE TABLE Report_WhistleAlert (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  user_role_unit_id INT NOT NULL,
+  user_id INT NOT NULL,
   codigo VARCHAR(8) NOT NULL,
   nombre_contacto VARCHAR(100),
   numero_contacto VARCHAR(20),
@@ -176,11 +176,11 @@ CREATE TABLE Report_WhistleAlert (
   fecha_registro DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
   
-  FOREIGN KEY (user_role_unit_id) REFERENCES User_X_Role_X_Unit(id)
+  FOREIGN KEY (user_id) REFERENCES User(id)
 );
 CREATE TABLE Report_RiskFactor (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  user_role_unit_id INT NOT NULL,
+  user_id INT NOT NULL,
   codigo VARCHAR(8) NOT NULL,
   descripcion_corta VARCHAR(150),
   detalle TEXT,
@@ -188,7 +188,7 @@ CREATE TABLE Report_RiskFactor (
   fecha_registro DATETIME NOT NULL,
   activo BOOLEAN NOT NULL,
   
-  FOREIGN KEY (user_role_unit_id) REFERENCES User_X_Role_X_Unit(id)
+  FOREIGN KEY (user_id) REFERENCES User(id)
 );
 
 ### CREACION DE RIESGOS Y ASOCIACIONES
