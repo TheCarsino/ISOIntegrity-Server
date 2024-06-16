@@ -205,7 +205,28 @@ export const deleteUnitArea = async (req, res) => {
     unitarea.ultima_modificacion = new Date().getTime();
     unitarea.activo = false;
     await unitarea.save();
-
+    //Delete the Process
+    const process_unit = await Process.findAll({
+      where: {
+        unit_area_id: id,
+      },
+    });
+    for (let process of process_unit) {
+      process.ultima_modificacion = new Date().getTime();
+      process.activo = false;
+      await process.save();
+      //Delete the Risks
+      const process_risks = await Risk.findAll({
+        where: {
+          process_id: process.id,
+        },
+      });
+      for (let risk of process_risks) {
+        risk.ultima_modificacion = new Date().getTime();
+        risk.activo = false;
+        await risk.save();
+      }
+    }
     return res.sendStatus(204);
   } catch (error) {
     return res.status(500).json({ message: error.message });

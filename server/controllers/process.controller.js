@@ -46,7 +46,7 @@ export const createProcess = async (req, res) => {
         codigo,
         nombre,
         descripcion,
-        tiene_controles: tiene_controles != null ? true : false,
+        tiene_controles: tiene_controles,
         fecha_creacion: new Date().getTime(),
         ultima_modificacion: new Date().getTime(),
         activo: true,
@@ -102,6 +102,18 @@ export const deleteProcess = async (req, res) => {
     process.ultima_modificacion = new Date().getTime();
     process.activo = false;
     await process.save();
+
+    //Delete all of the risks
+    const process_risks = await Risk.findAll({
+      where: {
+        process_id: id,
+      },
+    });
+    for (let risk of process_risks) {
+      risk.ultima_modificacion = new Date().getTime();
+      risk.activo = false;
+      await risk.save();
+    }
 
     return res.sendStatus(204);
   } catch (error) {

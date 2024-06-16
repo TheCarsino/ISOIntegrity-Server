@@ -336,7 +336,7 @@ async function retrieveRiskReportsbyUserPermission(userPermissions) {
 
 export const testMetrics = async (req, res) => {
   const severities = [0.2, 0.4, 0.6, 0.8, 1];
-  const num_cases = [0, 1, 2, 4, 6, 10];
+  const num_cases = [0, 1, 2, 4, 6, 10, 1000];
 
   let listTest = [];
   for (let severity of severities) {

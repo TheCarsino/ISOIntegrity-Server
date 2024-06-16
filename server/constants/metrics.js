@@ -8,7 +8,7 @@ export const ALTA_DIRECTIVA = 2;
 export const GESTOR_PROYECTOS = 3;
 export const COLABORADOR = 4;
 
-const SEVERITY_FACTOR_LOG = 0.125;
+const SEVERITY_FACTOR_LOG = 0.5;
 const SEVERITY_FACTOR = 0.5;
 const MIN_CASES_LOG = 2;
 
@@ -19,10 +19,13 @@ export function logaritmicCalculation(severity, num_cases) {
 
   if (num_cases > 0) {
     const naturalLog = Math.log((num_cases + MIN_CASES_LOG) * (1 + severity));
-    riskLevel = (severity * SEVERITY_FACTOR_LOG + (1 - 1 / naturalLog)) * 100;
+    riskLevel =
+      (severity * SEVERITY_FACTOR + (1 - 1 / naturalLog) * SEVERITY_FACTOR) *
+      100;
   } else {
     riskLevel = severity * SEVERITY_FACTOR * 100;
   }
+  8;
 
   return riskLevel;
 }

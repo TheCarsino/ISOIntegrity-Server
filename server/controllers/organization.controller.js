@@ -210,6 +210,7 @@ export const getOrganizationbyStructure = async (req, res) => {
                   where: {
                     activo: true,
                   },
+                  order: [["codigo", "ASC"]],
                   required: false,
                 },
               ],
@@ -217,6 +218,7 @@ export const getOrganizationbyStructure = async (req, res) => {
                 es_area: false,
                 activo: true,
               },
+              order: [["codigo", "ASC"]],
               required: false,
             },
             {
@@ -228,6 +230,7 @@ export const getOrganizationbyStructure = async (req, res) => {
                   where: {
                     activo: true,
                   },
+                  order: [["codigo", "ASC"]],
                   required: false,
                 },
               ],
@@ -235,18 +238,21 @@ export const getOrganizationbyStructure = async (req, res) => {
                 es_area: true,
                 activo: true,
               },
+              order: [["codigo", "ASC"]],
               required: false,
             },
           ],
           where: {
             activo: true,
           },
+          order: [["codigo", "ASC"]],
           required: false,
         },
       ],
       where: {
         activo: true,
       },
+      order: [["codigo", "ASC"]],
     });
     res.json(structure);
   } catch (error) {
@@ -274,6 +280,7 @@ export const getOrganizationbyStructureDetail = async (req, res) => {
                   where: {
                     activo: true,
                   },
+                  order: [["codigo", "ASC"]],
                   required: false,
                 },
               ],
@@ -281,6 +288,7 @@ export const getOrganizationbyStructureDetail = async (req, res) => {
                 es_area: false,
                 activo: true,
               },
+              order: [["codigo", "ASC"]],
               required: false,
             },
             {
@@ -292,6 +300,7 @@ export const getOrganizationbyStructureDetail = async (req, res) => {
                   where: {
                     activo: true,
                   },
+                  order: [["codigo", "ASC"]],
                   required: false,
                 },
               ],
@@ -299,18 +308,21 @@ export const getOrganizationbyStructureDetail = async (req, res) => {
                 es_area: true,
                 activo: true,
               },
+              order: [["codigo", "ASC"]],
               required: false,
             },
           ],
           where: {
             activo: true,
           },
+          order: [["codigo", "ASC"]],
           required: false,
         },
       ],
       where: {
         activo: true,
       },
+      order: [["codigo", "ASC"]],
     });
 
     const risks = await Risk.findAll({
