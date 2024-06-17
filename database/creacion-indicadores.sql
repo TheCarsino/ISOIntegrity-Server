@@ -359,7 +359,7 @@ INSERT INTO RiskIndicator_X_StandardSubRequirement (riskind_id, std_req_id, std_
 INSERT INTO RiskIndicator_X_StandardSubRequirement (riskind_id, std_req_id, std_sub_id) VALUES (44, 1, 4);
 
 SELECT DISTINCT rxs.id, rsk.codigo, rsk.nombre, std.nombre, sub.nombre 
-FROM RiskIndicator_X_StandardSubrequirement AS rxs
+FROM RiskIndicator_X_StandardSubRequirement AS rxs
 INNER JOIN RiskIndicator AS rsk ON rsk.id = rxs.riskind_id
 INNER JOIN StandardRequirement AS std ON std.id = rxs.std_req_id
 LEFT JOIN StandardSubrequirement AS sub ON (sub.id = rxs.std_sub_id);

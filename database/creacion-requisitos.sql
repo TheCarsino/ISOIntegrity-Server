@@ -115,7 +115,7 @@ VALUES (28, '9.3.1) Revisión por parte de la alta dirección');
 INSERT INTO StandardSubrequirement (std_req_id, nombre)
 VALUES (28, '9.3.2) Revisión del órgano de gobierno');
 
-SELECT * FROM standardrequirement;
+SELECT * FROM StandardRequirement;
 
 SELECT std.nombre, sub.nombre 
 FROM StandardRequirement AS std
