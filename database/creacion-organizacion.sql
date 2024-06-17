@@ -4,7 +4,7 @@
 
 INSERT INTO Organization (nombre, rubro, tipo, categoria, direccion, ciudad, pais, logo_filename, fecha_creacion, ultima_modificacion, activo)
 VALUES ('Mutliverso SIG S.A.C.', 'Consultoría y servicios a empresas', 'Empresa privada', "Sociedad o asociación civil", 
-		'Jr. Miguel Grau Nro. 1098 Bar. Santa Ana (Paseo Peatonal de Cajabamba Jr. Grau), Cajabamba, Cajamarca', 'Perú', '/assets/multiverso-sig-logo.jpg', CURDATE(), CURDATE(), TRUE);
+		'Jr. Miguel Grau Nro. 1098 Bar. Santa Ana (Paseo Peatonal de Cajabamba Jr. Grau), Cajabamba', 'Cajamarca', 'Perú', '/assets/multiverso-sig-logo.jpg', CURDATE(), CURDATE(), TRUE);
 
 INSERT INTO RiskTreatment (nombre)
 VALUES ('Tratamiento'),
