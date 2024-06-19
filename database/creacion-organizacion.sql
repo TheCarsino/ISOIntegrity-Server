@@ -7,7 +7,7 @@ VALUES ('Mutliverso SIG S.A.C.', 'Consultoría y servicios a empresas', 'Empresa
 		'Jr. Miguel Grau Nro. 1098 Bar. Santa Ana (Paseo Peatonal de Cajabamba Jr. Grau), Cajabamba', 'Cajamarca', 'Perú', '/assets/multiverso-sig-logo.jpg', CURDATE(), CURDATE(), TRUE);
 
 INSERT INTO RiskTreatment (nombre)
-VALUES ('Tratamiento'),
+VALUES ('Aceptación'),
 		('Explotación'),
 		('Mitigación'),
 		('Transferencia'),
